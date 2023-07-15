@@ -15,8 +15,11 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-    const user = await this.repo.findOneBy({ id });
+    if (!id) {
+      return;
+    }
 
+    const user = await this.repo.findOneBy({ id });
     if (!user) {
       throw new NotFoundException('Not Found');
     }
@@ -30,14 +33,12 @@ export class UsersService {
 
   async update(id: string, body: Partial<UserEntity>) {
     const userUpdate = await this.findOne(id);
-
     Object.assign(userUpdate, body);
     return this.repo.save(userUpdate);
   }
 
   async remove(id: string) {
     const user = await this.findOne(id);
-
     return this.repo.remove(user);
   }
 }
