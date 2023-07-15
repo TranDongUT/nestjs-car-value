@@ -11,11 +11,6 @@ async function bootstrap() {
     }),
   );
 
-  app.use(
-    cookieSession({
-      keys: ['secrect'],
-    }),
-  );
   await app.listen(3000);
 }
 bootstrap();

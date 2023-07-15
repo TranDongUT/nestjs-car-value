@@ -9,4 +9,7 @@ export class ResponseUserDto {
 
   @Exclude()
   password: string;
+
+  @Expose()
+  access_token: string;
 }
