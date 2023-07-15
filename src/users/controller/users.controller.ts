@@ -21,6 +21,9 @@ import { UsersService } from './../services/users.service';
 import { CurrentUserInterceptor } from '../interceptors/currentUser.interceptor';
 import { UserEntity } from '../user.entity';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { Roles } from 'src/dercorators/role.decorator';
+import { Role } from 'src/enums/role.enum';
+import { RolesGuard } from 'src/guards/role.guard';
 
 @Controller('auth')
 @Serialize(ResponseUserDto)
@@ -71,13 +74,17 @@ export class UserController {
   }
 
   @Patch('/:id')
-  @UseGuards(AuthGuard)
+  @Roles(Role.ADMIN, Role.USER)
+  @UseGuards(AuthGuard, RolesGuard)
   updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return this.UsersService.update(id, body);
   }
 
   @Delete('/:id')
+  // authentication
   @UseGuards(AuthGuard)
+  // authorization: ONLY ADMIN
+  @Roles(Role.ADMIN)
   removeUser(@Param('id') id: string) {
     return this.UsersService.remove(id);
   }
