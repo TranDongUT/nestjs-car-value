@@ -3,12 +3,16 @@ import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { ROLES_KEY } from 'src/dercorators/role.decorator';
 import { Role } from 'src/enums/role.enum';
+import { UsersService } from 'src/users/services/users.service';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(
+    private reflector: Reflector,
+    private usersService: UsersService,
+  ) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     // define what role which this route require
     const rolesRequire = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
       context.getClass(),
@@ -19,10 +23,9 @@ export class RolesGuard implements CanActivate {
       return true;
     }
     const request = context.switchToHttp().getRequest();
-    const { role: userRoles } = request.user;
-    // console.log(userRoles);
-    // console.log(rolesRequire);
+    const { id } = request.user.payload;
+    const currentRole = (await this.usersService.findOne(id)).role;
 
-    return rolesRequire.some((role) => role === userRoles);
+    return rolesRequire.some((role) => role === currentRole);
   }
 }
