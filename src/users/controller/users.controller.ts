@@ -9,21 +9,18 @@ import {
   Query,
   Session,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { CurrentUser } from 'src/dercorators/currentUser.decorator';
+import { Roles } from 'src/dercorators/role.decorator';
+import { Role } from 'src/enums/role.enum';
+import { RolesGuard } from 'src/guards/role.guard';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { CreateUserDto } from '../dtos/createUser.dto';
 import { ResponseUserDto } from '../dtos/responseUser.dto';
 import { UpdateUserDto } from '../dtos/updateUser.dto';
 import { AuthService } from '../services/auth.service';
-import { UsersService } from './../services/users.service';
-import { CurrentUserInterceptor } from '../interceptors/currentUser.interceptor';
 import { UserEntity } from '../user.entity';
-import { AuthGuard } from 'src/guards/auth.guard';
-import { Roles } from 'src/dercorators/role.decorator';
-import { Role } from 'src/enums/role.enum';
-import { RolesGuard } from 'src/guards/role.guard';
+import { UsersService } from './../services/users.service';
 
 @Controller('auth')
 @Serialize(ResponseUserDto)
@@ -45,40 +42,40 @@ export class UserController {
     return user;
   }
 
-  @Post('/infor')
-  @UseGuards(AuthGuard)
+  @Get('/infor')
   getAuthInfor(@CurrentUser() user: UserEntity) {
     return user;
   }
 
+  @Post('/refresh')
+  refreshToken(@Body('refreshToken') refreshToken: string) {
+    return this.AuthService.refreshToken(refreshToken);
+  }
+
   @Post('/signout')
-  signout(@Session() session: any) {
-    session.userId = null;
+  signout(@Body('refreshToken') refreshToken: string) {
+    return this.AuthService.signout(refreshToken);
   }
 
   @Get('/:id')
-  @UseGuards(AuthGuard)
   async findUser(@Param('id') id: string) {
     const user = await this.UsersService.findOne(id);
     return user;
   }
 
   @Get()
-  @UseGuards(AuthGuard)
   findAllUser(@Query('email') email: string) {
     return this.UsersService.find(email);
   }
 
   @Patch('/:id')
   @Roles(Role.ADMIN, Role.USER)
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return this.UsersService.update(id, body);
   }
 
   @Delete('/:id')
-  // authentication
-  @UseGuards(AuthGuard)
   // authorization: ONLY ADMIN
   @Roles(Role.ADMIN)
   removeUser(@Param('id') id: string) {

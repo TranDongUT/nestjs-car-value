@@ -23,24 +23,12 @@ export class UserEntity {
   @Exclude()
   password: string;
 
-  // @AfterInsert()
-  // logInsert(id: string) {
-  //   console.log('Insert new user', id);
-  // }
-
-  // @AfterUpdate()
-  // logUpdate(id: string) {
-  //   console.log('Update user', id);
-  // }
-
-  // @AfterRemove()
-  // logRemove(id: string) {
-  //   console.log('Remove user', id);
-  // }
-
   @OneToMany(() => ReportEntity, (report) => report.user)
   reports: ReportEntity[];
 
   @Column({ default: Role.USER })
   role: string;
+
+  @Column({ default: '' })
+  refreshToken: string;
 }

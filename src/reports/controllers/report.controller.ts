@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CurrentUser } from 'src/dercorators/currentUser.decorator';
@@ -18,9 +19,9 @@ import { ReportService } from '../services/report.service';
 import { Role } from 'src/enums/role.enum';
 import { Roles } from 'src/dercorators/role.decorator';
 import { RolesGuard } from 'src/guards/role.guard';
+import { GetEstimateDto } from '../dtos/getEstimate.dto';
 
 @Controller('report')
-@UseGuards(AuthGuard)
 export class ReportController {
   constructor(private reportService: ReportService) {}
 
@@ -41,5 +42,10 @@ export class ReportController {
   @UseGuards(RolesGuard)
   approveReport(@Param('id') id: string, @Body() body: ApproveReportDto) {
     return this.reportService.changeApprove(id, body.isApprove);
+  }
+
+  @Get()
+  getEstimate(@Query() query: GetEstimateDto) {
+    console.log(query);
   }
 }

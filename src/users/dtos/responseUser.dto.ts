@@ -7,9 +7,12 @@ export class ResponseUserDto {
   @Expose()
   email: string;
 
-  @Exclude()
+  @Exclude() // hidden
   password: string;
 
   @Expose()
   access_token: string;
+
+  @Expose()
+  refresh_token: string;
 }
