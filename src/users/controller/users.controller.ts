@@ -18,9 +18,10 @@ import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { CreateUserDto } from '../dtos/createUser.dto';
 import { ResponseUserDto } from '../dtos/responseUser.dto';
 import { UpdateUserDto } from '../dtos/updateUser.dto';
-import { AuthService } from '../services/auth.service';
+
 import { UserEntity } from '../user.entity';
 import { UsersService } from './../services/users.service';
+import { AuthService } from '../services/auth.service';
 
 @Controller('auth')
 @Serialize(ResponseUserDto)

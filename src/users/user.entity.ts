@@ -1,6 +1,8 @@
 import { ReportEntity } from './../reports/report.entity';
 import { Exclude } from 'class-transformer';
 import { Role } from 'src/enums/role.enum';
+import { TokenEntity } from 'src/tokens/token.entity';
+
 import {
   AfterInsert,
   AfterRemove,
@@ -29,6 +31,6 @@ export class UserEntity {
   @Column({ default: Role.USER })
   role: string;
 
-  @Column({ default: '' })
-  refreshToken: string;
+  @OneToMany(() => TokenEntity, (token) => token.user)
+  refreshToken: TokenEntity[];
 }

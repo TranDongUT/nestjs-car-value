@@ -7,13 +7,16 @@ import {
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from './users/user.entity';
-import { ReportEntity } from './reports/report.entity';
-import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthMiddleware } from './middlewares/authen.middleware';
 import { ReportController } from './reports/controllers/report.controller';
+import { ReportEntity } from './reports/report.entity';
+import { UserEntity } from './users/user.entity';
+import { TokensModule } from './tokens/tokens.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -23,11 +26,13 @@ import { ReportController } from './reports/controllers/report.controller';
       database: 'db.sqlite',
       entities: [UserEntity, ReportEntity],
       synchronize: true,
+      autoLoadEntities: true,
     }),
 
     // modules
     UsersModule,
     ReportsModule,
+    TokensModule,
 
     // config enviroment variable
     ConfigModule.forRoot(),
@@ -38,6 +43,19 @@ import { ReportController } from './reports/controllers/report.controller';
       secret: process.env.SECERT_JWT,
       signOptions: { expiresIn: '600s' },
     }),
+
+    // rate limit
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
+    }),
+  ],
+
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule implements NestModule {
