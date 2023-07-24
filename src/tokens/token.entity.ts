@@ -1,6 +1,8 @@
+import { timeStamp } from 'console';
 import { UserEntity } from 'src/users/user.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   ManyToOne,
   PrimaryColumn,
@@ -16,5 +18,8 @@ export class TokenEntity {
   refreshToken: string;
 
   @ManyToOne(() => UserEntity, (user) => user.refreshToken)
-  user: UserEntity;
+  userId: string;
+
+  @CreateDateColumn()
+  createAt: Date;
 }

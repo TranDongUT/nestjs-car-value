@@ -41,7 +41,7 @@ import { APP_GUARD } from '@nestjs/core';
     JwtModule.register({
       global: true,
       secret: process.env.SECERT_JWT,
-      signOptions: { expiresIn: '600s' },
+      signOptions: { expiresIn: '10m' },
     }),
 
     // rate limit

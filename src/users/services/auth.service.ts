@@ -10,8 +10,8 @@ import { promisify } from 'util';
 
 // services
 
-import { UsersService } from 'src/users/services/users.service';
 import { TokensService } from 'src/tokens/tokens.service';
+import { UsersService } from 'src/users/services/users.service';
 
 const scrypt = promisify(_scrypt);
 
@@ -22,6 +22,8 @@ export class AuthService {
     private jwtService: JwtService,
     private tokensService: TokensService,
   ) {}
+
+  private maxCountRefreshToken = 5;
 
   async signup(email: string, password: string) {
     // check email is used
@@ -68,6 +70,13 @@ export class AuthService {
         expiresIn: '1h',
       },
     );
+
+    // remove oldes tokens
+    const [tokens, countTokens] = await this.tokensService.findAll(user);
+    if (countTokens === this.maxCountRefreshToken) {
+      const oldesToken = tokens[0];
+      await this.tokensService.removeToken(oldesToken.refreshToken);
+    }
 
     // store to db
     await this.tokensService.saveToken(refresh_token, user);
