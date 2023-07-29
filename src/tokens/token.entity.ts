@@ -17,9 +17,9 @@ export class TokenEntity {
   @Column()
   refreshToken: string;
 
-  @ManyToOne(() => UserEntity, (user) => user.refreshToken)
-  userId: string;
-
   @CreateDateColumn()
   createAt: Date;
+
+  @ManyToOne(() => UserEntity, (user) => user.refreshToken)
+  user: UserEntity;
 }

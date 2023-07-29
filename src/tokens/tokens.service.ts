@@ -11,19 +11,25 @@ export class TokensService {
   ) {}
 
   saveToken(refreshToken: string, user: UserEntity) {
-    const newToken = this.repo.create({ refreshToken, userId: user.id });
+    const newToken = this.repo.create({ refreshToken, user });
     return this.repo.save(newToken);
   }
 
   async findAll(user: UserEntity) {
+    // console.log(user.id);
     const [tokens, countTokens] = await this.repo.findAndCount({
-      where: {
-        userId: user.id,
-      },
+      where: { user: { id: user.id } },
       order: {
         createAt: 'ASC',
       },
     });
+
+    // const tokens = await this.repo
+    //   .createQueryBuilder()
+    //   .select('*')
+    //   .where('userId = :userId', { userId: user.id })
+    //   .orderBy('createAt', 'ASC')
+    //   .getRawMany();
 
     return [tokens, countTokens];
   }

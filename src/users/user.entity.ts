@@ -31,6 +31,6 @@ export class UserEntity {
   @Column({ default: Role.USER })
   role: string;
 
-  @OneToMany(() => TokenEntity, (token) => token.userId)
+  @OneToMany(() => TokenEntity, (token) => token.user)
   refreshToken: TokenEntity[];
 }

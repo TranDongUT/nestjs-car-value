@@ -7,7 +7,7 @@ import {
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthMiddleware } from './middlewares/authen.middleware';
@@ -17,25 +17,36 @@ import { UserEntity } from './users/user.entity';
 import { TokensModule } from './tokens/tokens.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { TokenEntity } from './tokens/token.entity';
 
 @Module({
   imports: [
+    // config enviroment variable
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV}`,
+    }),
+
     // typeORM
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'db.sqlite',
-      entities: [UserEntity, ReportEntity],
-      synchronize: true,
-      autoLoadEntities: true,
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        type: 'mysql',
+        host: 'localhost',
+        port: 3306,
+        database: config.get<string>('MYSQL_DATABASE'),
+        username: config.get<string>('MYSQL_USER'),
+        password: config.get<string>('MYSQL_PASSWORD'),
+        synchronize: true,
+        autoLoadEntities: true,
+        entities: [UserEntity, ReportEntity, TokenEntity],
+      }),
     }),
 
     // modules
     UsersModule,
     ReportsModule,
     TokensModule,
-
-    // config enviroment variable
-    ConfigModule.forRoot(),
 
     // config jwt
     JwtModule.register({

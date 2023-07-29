@@ -73,7 +73,8 @@ export class AuthService {
 
     // remove oldes tokens
     const [tokens, countTokens] = await this.tokensService.findAll(user);
-    if (countTokens === this.maxCountRefreshToken) {
+
+    if (Number(countTokens) >= this.maxCountRefreshToken) {
       const oldesToken = tokens[0];
       await this.tokensService.removeToken(oldesToken.refreshToken);
     }
